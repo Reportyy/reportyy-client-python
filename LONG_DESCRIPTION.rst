@@ -17,6 +17,6 @@ Or:
 
 
 Setting up a Reportyy Account
----------------------------
+-----------------------------------
 
 Sign up for Reportyy at https://dashboard.reportyy.com/register.
