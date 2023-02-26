@@ -1,0 +1,8 @@
+[flake8]
+exclude =
+    src/reportyy/six.py
+
+# E501 is the "Line too long" error.
+# W503 goes against PEP8 rules. It's disabled by default, but must be disabled
+# explicitly when using `ignore`.
+ignore = E501, W503

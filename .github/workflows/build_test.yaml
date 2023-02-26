@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+*
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: lint
+        run: make lint
+
+      - name: fmtcheck
+        run: make fmtcheck
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install tools
+        run: make venv
+
+      - name: Build and check package
+        run: |
+          set -x
+          source venv/bin/activate
+          python setup.py clean --all sdist bdist_wheel --universal
+          python -m twine check dist/*
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist/
+
+  test:
+    name: Test
+    # Specific ubuntu version to support python 3.6 testing
+    # see https://github.com/actions/setup-python/issues/544#issuecomment-1332535877 for details
+    # move to ubuntu-latest when we drop 3.6
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version:
+          [
+            "2.7",
+            "3.7",
+            "3.8",
+            "3.9",
+            "3.10",
+          ]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip and virtualenv to latest
+        run: pip install --upgrade pip virtualenv
+
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          python -c "from pip._internal.locations import USER_CACHE_DIR; print('::set-output name=dir::' + USER_CACHE_DIR)"
+
+      - name: pip cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('setup.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Test with pytest
+        run: echo "TODO"
