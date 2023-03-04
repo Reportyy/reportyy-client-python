@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function
 
 # Configuration variables
-api_base = "https://api.reportyy.com"
+api_base_url = "https://api.reportyy.com"
 verify_ssl_certs = True
 proxy = None
 default_http_client = None
@@ -11,3 +11,4 @@ log = None
 
 # API client
 from reportyy.client import *  # noqa E402
+from reportyy.reportyy_response import *  # noqa E402

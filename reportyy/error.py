@@ -37,10 +37,6 @@ class ReportyyApiError(Exception):
         else:
             return msg
 
-    # Returns the underlying `Exception` (base class) message, which is usually
-    # the raw message returned by Stripe's API. This was previously available
-    # in python2 via `error.message`. Unlike `str(error)`, it omits "Request
-    # req_..." from the beginning of the string.
     @property
     def user_message(self):
         return self._message
@@ -54,6 +50,18 @@ class ReportyyApiError(Exception):
 
 
 class APIError(ReportyyApiError):
+    pass
+
+
+class AuthenticationError(ReportyyApiError):
+    pass
+
+
+class RateLimitError(ReportyyApiError):
+    pass
+
+
+class InvalidRequestError(ReportyyApiError):
     pass
 
 
